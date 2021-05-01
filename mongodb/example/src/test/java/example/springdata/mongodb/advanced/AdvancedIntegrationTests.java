@@ -22,29 +22,30 @@ import example.springdata.mongodb.customer.Customer;
 import org.bson.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Meta;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.client.FindIterable;
 
 /**
  * @author Christoph Strobl
  * @author Oliver Gierke
  */
-@SpringBootTest
-public class AdvancedIntegrationTests {
+@DataMongoTest
+class AdvancedIntegrationTests {
 
 	@Autowired AdvancedRepository repository;
 	@Autowired MongoOperations operations;
 
-	Customer dave, oliver, carter;
+	private Customer dave, oliver, carter;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 
 		repository.deleteAll();
 
@@ -60,7 +61,7 @@ public class AdvancedIntegrationTests {
 	 * <strong>NOTE</strong>: Requires MongoDB v. 2.6.4+
 	 */
 	@Test
-	public void findByFirstnameUsingMetaAttributes() {
+	void findByFirstnameUsingMetaAttributes() {
 
 		// execute derived finder method just to get the comment in the profile log
 		repository.findByFirstname(dave.getFirstname());
@@ -68,12 +69,12 @@ public class AdvancedIntegrationTests {
 		// execute another finder without meta attributes that should not be picked up
 		repository.findByLastname(dave.getLastname(), Sort.by("firstname"));
 
-		FindIterable<Document> cursor = operations.getCollection(ApplicationConfiguration.SYSTEM_PROFILE_DB)
+		var cursor = operations.getCollection(ApplicationConfiguration.SYSTEM_PROFILE_DB)
 				.find(new BasicDBObject("query.$comment", AdvancedRepository.META_COMMENT));
 
-		for (Document document : cursor) {
+		for (var document : cursor) {
 
-			Document query = (Document) document.get("query");
+			var query = (Document) document.get("query");
 			assertThat(query).containsKey("foo");
 		}
 	}

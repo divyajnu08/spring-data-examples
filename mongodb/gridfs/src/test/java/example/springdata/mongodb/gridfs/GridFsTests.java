@@ -26,15 +26,13 @@ import java.io.InputStream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
-import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.util.StreamUtils;
-
-import com.mongodb.client.gridfs.model.GridFSFile;
 
 /**
  * Tests to show the usage of {@link GridFsOperations} with Spring Data MongoDB.
@@ -42,18 +40,18 @@ import com.mongodb.client.gridfs.model.GridFSFile;
  * @author Hartmut Lang
  * @author Mark Paluch
  */
-@SpringBootTest
-public class GridFsTests {
+@DataMongoTest
+class GridFsTests {
 
 	@Autowired GridFsOperations gridFsOperations;
 
 	@BeforeEach
-	public void before() {
+	void before() {
 		gridFsOperations.delete(new Query());
 	}
 
 	@Test
-	public void shouldStoreSimpleFile() throws IOException {
+	void shouldStoreSimpleFile() throws IOException {
 
 		try (InputStream is = new BufferedInputStream(new ClassPathResource("./example-file.txt").getInputStream())) {
 			// store file
@@ -62,28 +60,28 @@ public class GridFsTests {
 		}
 
 		// get file or resource by filename
-		GridFSFile file = gridFsOperations.findOne(query(whereFilename().is("example-file.txt")));
+		var file = gridFsOperations.findOne(query(whereFilename().is("example-file.txt")));
 
 		assertThat(file.getFilename()).isEqualTo("example-file.txt");
 	}
 
 	@Test
-	public void shouldStoreFileWithMetadata() throws IOException {
+	void shouldStoreFileWithMetadata() throws IOException {
 
 		try (InputStream is = new BufferedInputStream(new ClassPathResource("./example-file.txt").getInputStream())) {
 
 			// store file with metaData
-			Customer customerMetaData = new Customer("Hardy", "Lang");
+			var customerMetaData = new Customer("Hardy", "Lang");
 			gridFsOperations.store(is, "example-file.txt", customerMetaData);
 		}
 
 		// search by metaData
-		GridFSFile file = gridFsOperations.findOne(query(whereMetaData("firstName").is("Hardy")));
+		var file = gridFsOperations.findOne(query(whereMetaData("firstName").is("Hardy")));
 		assertThat(file.getFilename()).isEqualTo("example-file.txt");
 	}
 
 	@Test
-	public void shouldStoreAndReadFile() throws IOException {
+	void shouldStoreAndReadFile() throws IOException {
 
 		byte[] bytes;
 		try (InputStream is = new BufferedInputStream(new ClassPathResource("./example-file.txt").getInputStream())) {
@@ -93,10 +91,10 @@ public class GridFsTests {
 		// store file
 		gridFsOperations.store(new ByteArrayInputStream(bytes), "example-file.txt");
 
-		GridFsResource resource = gridFsOperations.getResource("example-file.txt");
+		var resource = gridFsOperations.getResource("example-file.txt");
 
 		byte[] loaded;
-		try (InputStream is = resource.getInputStream()) {
+		try (var is = resource.getInputStream()) {
 			loaded = StreamUtils.copyToByteArray(is);
 		}
 

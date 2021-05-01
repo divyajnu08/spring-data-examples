@@ -18,7 +18,6 @@ package example.springdata.mongodb.people;
 import static org.assertj.core.api.Assertions.*;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import rx.RxReactiveStreams;
 
@@ -26,8 +25,9 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -37,23 +37,23 @@ import org.springframework.data.mongodb.core.query.Query;
  *
  * @author Mark Paluch
  */
-@SpringBootTest
-public class ReactiveMongoTemplateIntegrationTest {
+@DataMongoTest
+class ReactiveMongoTemplateIntegrationTest {
 
 	@Autowired ReactiveMongoTemplate template;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 
 		StepVerifier.create(template.dropCollection(Person.class)).verifyComplete();
 
-		Flux<Person> insertAll = template
+		var insertAll = template
 				.insertAll(Flux.just(new Person("Walter", "White", 50), //
 						new Person("Skyler", "White", 45), //
 						new Person("Saul", "Goodman", 42), //
 						new Person("Jesse", "Pinkman", 27)).collectList());
 
-		StepVerifier.create(insertAll).expectNextCount(4).verifyComplete();
+		insertAll.as(StepVerifier::create).expectNextCount(4).verifyComplete();
 	}
 
 	/**
@@ -61,9 +61,9 @@ public class ReactiveMongoTemplateIntegrationTest {
 	 * the two counts ({@code 4} and {@code 6}) to the console.
 	 */
 	@Test
-	public void shouldInsertAndCountData() {
+	void shouldInsertAndCountData() {
 
-		Mono<Long> count = template.count(new Query(), Person.class) //
+		var count = template.count(new Query(), Person.class) //
 				.doOnNext(System.out::println) //
 				.thenMany(template.insertAll(Arrays.asList(new Person("Hank", "Schrader", 43), //
 						new Person("Mike", "Ehrmantraut", 62)))) //
@@ -71,16 +71,16 @@ public class ReactiveMongoTemplateIntegrationTest {
 				.flatMap(v -> template.count(new Query(), Person.class)) //
 				.doOnNext(System.out::println);//
 
-		StepVerifier.create(count).expectNext(6L).verifyComplete();
+		count.as(StepVerifier::create).expectNext(6L).verifyComplete();
 	}
 
 	/**
 	 * Note that the all object conversions are performed before the results are printed to the console.
 	 */
 	@Test
-	public void convertReactorTypesToRxJava2() {
+	void convertReactorTypesToRxJava2() {
 
-		Flux<Person> flux = template.find(Query.query(Criteria.where("lastname").is("White")), Person.class);
+		var flux = template.find(Query.query(Criteria.where("lastname").is("White")), Person.class);
 
 		long count = RxReactiveStreams.toObservable(flux).count().toSingle().toBlocking().value();
 

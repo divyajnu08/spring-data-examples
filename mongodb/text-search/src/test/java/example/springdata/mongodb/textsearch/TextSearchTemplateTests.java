@@ -18,11 +18,10 @@ package example.springdata.mongodb.textsearch;
 import static example.springdata.mongodb.util.ConsoleResultPrinter.*;
 import static org.springframework.data.mongodb.core.query.Query.*;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.data.mongodb.core.query.TextQuery;
@@ -31,33 +30,20 @@ import org.springframework.data.mongodb.core.query.TextQuery;
  * @author Christoph Strobl
  * @author Thomas Darimont
  */
-@SpringBootTest
-public class TextSearchTemplateTests {
+@DataMongoTest
+class TextSearchTemplateTests {
 
 	@Autowired MongoOperations operations;
-
-	// @Before
-	// public void setUp() throws Exception {
-	//
-	// MongoProperties properties = new MongoProperties();
-	//
-	// operations = new MongoTemplate(properties.createMongoClient(null), properties.getMongoClientDatabase());
-	// operations.dropCollection(BlogPost.class);
-	//
-	// createIndex();
-	//
-	// BlogPostInitializer.INSTANCE.initialize(this.operations);
-	// }
 
 	/**
 	 * Show how to do simple matching. Note that text search is case insensitive and will also find entries like
 	 * {@literal releases}.
 	 */
 	@Test
-	public void findAllBlogPostsWithRelease() {
+	void findAllBlogPostsWithRelease() {
 
-		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingAny("release");
-		List<BlogPost> blogPosts = operations.find(query(criteria), BlogPost.class);
+		var criteria = TextCriteria.forDefaultLanguage().matchingAny("release");
+		var blogPosts = operations.find(query(criteria), BlogPost.class);
 
 		printResult(blogPosts, criteria);
 	}
@@ -66,15 +52,15 @@ public class TextSearchTemplateTests {
 	 * Sort by relevance relying on the value marked with {@link org.springframework.data.mongodb.core.mapping.TextScore}.
 	 */
 	@Test
-	public void findAllBlogPostsByPhraseSortByScore() {
+	void findAllBlogPostsByPhraseSortByScore() {
 
-		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingPhrase("release");
+		var criteria = TextCriteria.forDefaultLanguage().matchingPhrase("release");
 
-		TextQuery query = new TextQuery(criteria);
+		var query = new TextQuery(criteria);
 		query.setScoreFieldName("score");
 		query.sortByScore();
 
-		List<BlogPost> blogPosts = operations.find(query, BlogPost.class);
+		var blogPosts = operations.find(query, BlogPost.class);
 
 		printResult(blogPosts, criteria);
 	}

@@ -17,8 +17,9 @@ package example.springdata.mongodb.geojson;
 
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.geo.Point;
 import org.springframework.data.geo.Polygon;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -34,8 +35,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
  * @author Christoph Strobl
  * @author Oliver Gierke
  */
-@SpringBootTest
-public class StoreRepositoryTests {
+@DataMongoTest
+class StoreRepositoryTests {
 
 	private static final GeoJsonPolygon GEO_JSON_POLYGON = new GeoJsonPolygon(new Point(-73.992514, 40.758934),
 			new Point(-73.961138, 40.760348), new Point(-73.991658, 40.730006), new Point(-73.992514, 40.758934));
@@ -78,7 +79,7 @@ public class StoreRepositoryTests {
 	 * <pre>
 	 */
 	@Test
-	public void findWithinGeoJsonPolygon() {
+	void findWithinGeoJsonPolygon() {
 		repository.findByLocationWithin(GEO_JSON_POLYGON).forEach(System.out::println);
 	}
 
@@ -99,7 +100,7 @@ public class StoreRepositoryTests {
 	 * <pre>
 	 */
 	@Test
-	public void findWithinLegacyPolygon() {
+	void findWithinLegacyPolygon() {
 		repository.findByLocationWithin(new Polygon(new Point(-73.992514, 40.758934), new Point(-73.961138, 40.760348),
 				new Point(-73.991658, 40.730006))).forEach(System.out::println);
 	}
@@ -109,13 +110,13 @@ public class StoreRepositoryTests {
 	 * creation of the query using the registered {@link MongoConverter} for {@link GeoJson} conversion.
 	 */
 	@Test
-	public void findStoresThatIntersectGivenPolygon() {
+	void findStoresThatIntersectGivenPolygon() {
 
-		Document geoJsonDbo = new Document();
+		var geoJsonDbo = new Document();
 
 		operations.getConverter().write(GEO_JSON_POLYGON, geoJsonDbo);
 
-		BasicQuery bq = new BasicQuery(
+		var bq = new BasicQuery(
 				new Document("location", new Document("$geoIntersects", new Document("$geometry", geoJsonDbo))));
 
 		operations.find(bq, Store.class).forEach(System.out::println);

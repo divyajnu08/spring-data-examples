@@ -15,13 +15,12 @@
  */
 package example.springdata.jpa.security;
 
-import static java.util.Collections.singleton;
+import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.*;
-
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,18 +38,18 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @SpringBootTest
 @Transactional
-public class SecurityIntegrationTests {
+class SecurityIntegrationTests {
 
 	@Autowired UserRepository userRepository;
 	@Autowired BusinessObjectRepository businessObjectRepository;
 	@Autowired SecureBusinessObjectRepository secureBusinessObjectRepository;
 
-	User tom, ollie, admin;
-	UsernamePasswordAuthenticationToken olliAuth, tomAuth, adminAuth;
-	BusinessObject object1, object2, object3;
+	private User tom, ollie, admin;
+	private UsernamePasswordAuthenticationToken olliAuth, tomAuth, adminAuth;
+	private BusinessObject object1, object2, object3;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 
 		tom = userRepository.save(new User("thomas", "darimont", "tdarimont@example.org"));
 		ollie = userRepository.save(new User("oliver", "gierke", "ogierke@example.org"));
@@ -67,11 +66,11 @@ public class SecurityIntegrationTests {
 	}
 
 	@Test
-	public void findBusinessObjectsForCurrentUserShouldReturnOnlyBusinessObjectsWhereCurrentUserIsOwner() {
+	void findBusinessObjectsForCurrentUserShouldReturnOnlyBusinessObjectsWhereCurrentUserIsOwner() {
 
 		SecurityContextHolder.getContext().setAuthentication(tomAuth);
 
-		List<BusinessObject> businessObjects = secureBusinessObjectRepository.findBusinessObjectsForCurrentUser();
+		var businessObjects = secureBusinessObjectRepository.findBusinessObjectsForCurrentUser();
 
 		assertThat(businessObjects).containsExactly(object3);
 
@@ -83,21 +82,21 @@ public class SecurityIntegrationTests {
 	}
 
 	@Test
-	public void findBusinessObjectsForCurrentUserShouldReturnAllObjectsForAdmin() {
+	void findBusinessObjectsForCurrentUserShouldReturnAllObjectsForAdmin() {
 
 		SecurityContextHolder.getContext().setAuthentication(adminAuth);
 
-		List<BusinessObject> businessObjects = secureBusinessObjectRepository.findBusinessObjectsForCurrentUser();
+		var businessObjects = secureBusinessObjectRepository.findBusinessObjectsForCurrentUser();
 
 		assertThat(businessObjects).containsExactly(object1, object2, object3);
 	}
 
 	@Test
-	public void findBusinessObjectsForCurrentUserByIdShouldReturnOnlyBusinessObjectsWhereCurrentUserIsOwner() {
+	void findBusinessObjectsForCurrentUserByIdShouldReturnOnlyBusinessObjectsWhereCurrentUserIsOwner() {
 
 		SecurityContextHolder.getContext().setAuthentication(tomAuth);
 
-		List<BusinessObject> businessObjects = secureBusinessObjectRepository.findBusinessObjectsForCurrentUserById();
+		var businessObjects = secureBusinessObjectRepository.findBusinessObjectsForCurrentUserById();
 
 		assertThat(businessObjects).containsExactly(object3);
 
@@ -109,23 +108,23 @@ public class SecurityIntegrationTests {
 	}
 
 	@Test
-	public void findBusinessObjectsForCurrentUserByIdShouldReturnAllObjectsForAdmin() {
+	void findBusinessObjectsForCurrentUserByIdShouldReturnAllObjectsForAdmin() {
 
 		SecurityContextHolder.getContext().setAuthentication(adminAuth);
 
-		List<BusinessObject> businessObjects = secureBusinessObjectRepository.findBusinessObjectsForCurrentUserById();
+		var businessObjects = secureBusinessObjectRepository.findBusinessObjectsForCurrentUserById();
 
 		assertThat(businessObjects).containsExactly(object1, object2, object3);
 	}
 
 	@Test
-	public void customUpdateStatementShouldAllowToUseSecurityContextInformationViaSpelParameters() {
+	void customUpdateStatementShouldAllowToUseSecurityContextInformationViaSpelParameters() {
 
 		SecurityContextHolder.getContext().setAuthentication(adminAuth);
 
 		secureBusinessObjectRepository.modifiyDataWithRecordingSecurityContext();
 
-		for (BusinessObject bo : businessObjectRepository.findAll()) {
+		for (var bo : businessObjectRepository.findAll()) {
 
 			assertThat(bo.getLastModifiedDate()).isNotNull();
 			assertThat(bo.getLastModifiedBy().getFirstname()).isEqualTo("admin");

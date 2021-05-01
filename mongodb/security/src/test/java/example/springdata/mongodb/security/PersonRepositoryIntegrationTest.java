@@ -15,14 +15,13 @@
  */
 package example.springdata.mongodb.security;
 
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.Collections;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,14 +35,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * @author Oliver Gierke
  */
 @SpringBootTest
-public class PersonRepositoryIntegrationTest {
+class PersonRepositoryIntegrationTest {
 
 	@Autowired PersonRepository repository;
 
-	Person dave, oliver, carter, admin;
+	private Person dave, oliver, carter, admin;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 
 		repository.deleteAll();
 
@@ -54,26 +53,24 @@ public class PersonRepositoryIntegrationTest {
 	}
 
 	@Test
-	public void nonAdminCallingShouldReturnOnlyItSelfAsPerson() throws Exception {
+	void nonAdminCallingShouldReturnOnlyItSelfAsPerson() throws Exception {
 
 		SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(dave, "x"));
 
-		List<Person> persons = repository.findAllForCurrentUserById();
+		var persons = repository.findAllForCurrentUserById();
 
-		assertThat(persons, hasSize(1));
-		assertThat(persons, contains(dave));
+		assertThat(persons).hasSize(1).containsExactly(dave);
 	}
 
 	@Test
-	public void adminCallingShouldReturnAllUsers() throws Exception {
+	void adminCallingShouldReturnAllUsers() throws Exception {
 
-		UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(admin, "x",
+		var auth = new UsernamePasswordAuthenticationToken(admin, "x",
 				Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN")));
 		SecurityContextHolder.getContext().setAuthentication(auth);
 
-		List<Person> persons = repository.findAllForCurrentUserById();
+		var persons = repository.findAllForCurrentUserById();
 
-		assertThat(persons, hasSize(4));
-		assertThat(persons, containsInAnyOrder(admin, dave, carter, oliver));
+		assertThat(persons).hasSize(4).contains(admin, dave, carter, oliver);
 	}
 }

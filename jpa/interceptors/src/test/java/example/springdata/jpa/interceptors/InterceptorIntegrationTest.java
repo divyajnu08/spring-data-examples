@@ -16,6 +16,7 @@
 package example.springdata.jpa.interceptors;
 
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -24,14 +25,14 @@ import org.springframework.boot.test.context.SpringBootTest;
  * @author Divya Srivastava
  */
 @SpringBootTest
-public class InterceptorIntegrationTest {
+class InterceptorIntegrationTest {
 
 	@Autowired CustomerRepository repository;
 
 	@Test
-	public void foo() {
+	void foo() {
 
-		Customer customer = new Customer();
+		var customer = new Customer();
 		customer.firstname = "Dave";
 		customer.lastname = "Matthews";
 

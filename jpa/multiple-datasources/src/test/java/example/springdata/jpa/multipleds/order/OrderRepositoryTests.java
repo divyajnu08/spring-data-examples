@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.*;
 import example.springdata.jpa.multipleds.customer.CustomerRepository;
 
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,13 +34,13 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @SpringBootTest
 @Transactional(transactionManager = "orderTransactionManager")
-public class OrderRepositoryTests {
+class OrderRepositoryTests {
 
 	@Autowired OrderRepository orders;
 	@Autowired CustomerRepository customers;
 
 	@Test
-	public void persistsAndFindsCustomer() {
+	void persistsAndFindsCustomer() {
 
 		customers.findAll().forEach(customer -> {
 			assertThat(orders.findByCustomer(customer.getId())).hasSize(1);

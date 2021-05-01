@@ -15,18 +15,17 @@
  */
 package example.springdata.jpa.projections;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
-import java.util.Collection;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -39,9 +38,10 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Oliver Gierke
  * @author Divya Srivastava
  */
+
 @SpringBootTest
 @Transactional
-public class CustomerRepositoryIntegrationTest {
+class CustomerRepositoryIntegrationTest {
 
 	@Configuration
 	@EnableAutoConfiguration
@@ -49,17 +49,18 @@ public class CustomerRepositoryIntegrationTest {
 
 	@Autowired CustomerRepository customers;
 
-	Customer dave, carter;
+	private Customer dave;
+	private Customer carter;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 
 		this.dave = customers.save(new Customer("Dave", "Matthews"));
 		this.carter = customers.save(new Customer("Carter", "Beauford"));
 	}
 
 	@Test
-	public void projectsEntityIntoInterface() {
+	void projectsEntityIntoInterface() {
 
 		assertThat(customers.findAllProjectedBy())//
 				.hasSize(2)//
@@ -67,7 +68,7 @@ public class CustomerRepositoryIntegrationTest {
 	}
 
 	@Test
-	public void projectsMapIntoInterface() {
+	void projectsMapIntoInterface() {
 
 		assertThat(customers.findsByProjectedColumns())//
 				.hasSize(2)//
@@ -76,15 +77,15 @@ public class CustomerRepositoryIntegrationTest {
 	}
 
 	@Test
-	public void projectsToDto() {
+	void projectsToDto() {
 
 		assertThat(customers.findAllDtoedBy())//
 				.hasSize(2)//
-				.first().satisfies(it -> assertThat(it.getFirstname()).isEqualTo("Dave"));
+				.first().satisfies(it -> assertThat(it.firstname()).isEqualTo("Dave"));
 	}
 
 	@Test
-	public void projectsDynamically() {
+	void projectsDynamically() {
 
 		assertThat(customers.findByFirstname("Dave", CustomerProjection.class))//
 				.hasSize(1)//
@@ -93,9 +94,9 @@ public class CustomerRepositoryIntegrationTest {
 	}
 
 	@Test
-	public void projectsIndividualDynamically() {
+	void projectsIndividualDynamically() {
 
-		CustomerSummary result = customers.findProjectedById(dave.getId(), CustomerSummary.class);
+		var result = customers.findProjectedById(dave.getId(), CustomerSummary.class);
 
 		assertThat(result.getFullName()).isEqualTo("Dave Matthews");
 
@@ -105,9 +106,9 @@ public class CustomerRepositoryIntegrationTest {
 	}
 
 	@Test
-	public void projectIndividualInstance() {
+	void projectIndividualInstance() {
 
-		CustomerProjection projectedDave = customers.findProjectedById(dave.getId());
+		var projectedDave = customers.findProjectedById(dave.getId());
 
 		assertThat(projectedDave.getFirstname()).isEqualTo("Dave");
 		assertThat(projectedDave).isInstanceOfSatisfying(TargetAware.class,
@@ -115,25 +116,24 @@ public class CustomerRepositoryIntegrationTest {
 	}
 
 	@Test
-	public void projectsDtoUsingConstructorExpression() {
+	void projectsDtoUsingConstructorExpression() {
 
-		Collection<CustomerDto> result = customers.findDtoWithConstructorExpression("Dave");
+		var result = customers.findDtoWithConstructorExpression("Dave");
 
 		assertThat(result).hasSize(1);
-		assertThat(result.iterator().next().getFirstname()).isEqualTo("Dave");
+		assertThat(result.iterator().next().firstname()).isEqualTo("Dave");
 	}
 
 	@Test
-	public void supportsProjectionInCombinationWithPagination() {
+	void supportsProjectionInCombinationWithPagination() {
 
-		Page<CustomerProjection> page = customers
-				.findPagedProjectedBy(PageRequest.of(0, 1, Sort.by(Direction.ASC, "lastname")));
+		var page = customers.findPagedProjectedBy(PageRequest.of(0, 1, Sort.by(Direction.ASC, "lastname")));
 
 		assertThat(page.getContent().get(0).getFirstname()).isEqualTo("Carter");
 	}
 
 	@Test
-	public void appliesProjectionToOptional() {
+	void appliesProjectionToOptional() {
 		assertThat(customers.findOptionalProjectionByLastname("Beauford")).isPresent();
 	}
 }

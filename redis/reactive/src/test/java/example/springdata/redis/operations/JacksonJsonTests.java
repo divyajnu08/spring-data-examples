@@ -18,22 +18,19 @@ package example.springdata.redis.operations;
 import example.springdata.redis.EmailAddress;
 import example.springdata.redis.Person;
 import example.springdata.redis.RedisTestConfiguration;
-import example.springdata.redis.test.util.RequiresRedisServer;
+import example.springdata.redis.test.condition.EnabledOnRedisAvailable;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 import java.nio.ByteBuffer;
 
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.data.redis.util.ByteUtils;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * Show usage of reactive Template API on Redis lists using {@link ReactiveRedisOperations} with Jackson serialization.
@@ -41,12 +38,9 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author Mark Paluch
  */
 @Slf4j
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = RedisTestConfiguration.class)
-public class JacksonJsonTests {
-
-	// we only want to run this tests when redis is up an running
-	public static @ClassRule RequiresRedisServer requiresServer = RequiresRedisServer.onLocalhost();
+@EnabledOnRedisAvailable
+class JacksonJsonTests {
 
 	@Autowired ReactiveRedisOperations<String, Person> typedOperations;
 
@@ -60,21 +54,21 @@ public class JacksonJsonTests {
 	 * @see RedisTestConfiguration#reactiveJsonPersonRedisTemplate(ReactiveRedisConnectionFactory)
 	 */
 	@Test
-	public void shouldWriteAndReadPerson() {
+	void shouldWriteAndReadPerson() {
 
 		StepVerifier.create(typedOperations.opsForValue().set("homer", new Person("Homer", "Simpson"))) //
 				.expectNext(true) //
 				.verifyComplete();
 
-		Flux<String> get = typedOperations.execute(conn -> conn.stringCommands().get(ByteBuffer.wrap("homer".getBytes()))) //
+		var get = typedOperations.execute(conn -> conn.stringCommands().get(ByteBuffer.wrap("homer".getBytes()))) //
 				.map(ByteUtils::getBytes) //
 				.map(String::new);
 
-		StepVerifier.create(get) //
+		get.as(StepVerifier::create) //
 				.expectNext("{\"firstname\":\"Homer\",\"lastname\":\"Simpson\"}") //
 				.verifyComplete();
 
-		StepVerifier.create(typedOperations.opsForValue().get("homer")) //
+		typedOperations.opsForValue().get("homer").as(StepVerifier::create) //
 				.expectNext(new Person("Homer", "Simpson")) //
 				.verifyComplete();
 	}
@@ -87,21 +81,22 @@ public class JacksonJsonTests {
 	 * @see RedisTestConfiguration#reactiveJsonObjectRedisTemplate(ReactiveRedisConnectionFactory)
 	 */
 	@Test
-	public void shouldWriteAndReadPersonObject() {
+	void shouldWriteAndReadPersonObject() {
 
-		StepVerifier.create(genericOperations.opsForValue().set("homer", new Person("Homer", "Simpson"))) //
+		genericOperations.opsForValue().set("homer", new Person("Homer", "Simpson")) //
+				.as(StepVerifier::create) //
 				.expectNext(true) //
 				.verifyComplete();
 
-		Flux<String> get = genericOperations.execute(conn -> conn.stringCommands().get(ByteBuffer.wrap("homer".getBytes()))) //
+		var get = genericOperations.execute(conn -> conn.stringCommands().get(ByteBuffer.wrap("homer".getBytes()))) //
 				.map(ByteUtils::getBytes) //
 				.map(String::new);
 
-		StepVerifier.create(get) //
+		get.as(StepVerifier::create) //
 				.expectNext("{\"_type\":\"example.springdata.redis.Person\",\"firstname\":\"Homer\",\"lastname\":\"Simpson\"}") //
 				.verifyComplete();
 
-		StepVerifier.create(genericOperations.opsForValue().get("homer")) //
+		genericOperations.opsForValue().get("homer").as(StepVerifier::create) //
 				.expectNext(new Person("Homer", "Simpson")) //
 				.verifyComplete();
 	}
@@ -115,21 +110,23 @@ public class JacksonJsonTests {
 	 * @see RedisTestConfiguration#reactiveJsonObjectRedisTemplate(ReactiveRedisConnectionFactory)
 	 */
 	@Test
-	public void shouldWriteAndReadEmailObject() {
+	void shouldWriteAndReadEmailObject() {
 
-		StepVerifier.create(genericOperations.opsForValue().set("mail", new EmailAddress("homer@the-simpsons.com"))) //
+		genericOperations.opsForValue().set("mail", new EmailAddress("homer@the-simpsons.com")) //
+				.as(StepVerifier::create) //
 				.expectNext(true) //
 				.verifyComplete();
 
-		Flux<String> get = genericOperations.execute(conn -> conn.stringCommands().get(ByteBuffer.wrap("mail".getBytes()))) //
+		var get = genericOperations.execute(conn -> conn.stringCommands().get(ByteBuffer.wrap("mail".getBytes()))) //
 				.map(ByteUtils::getBytes) //
 				.map(String::new);
 
-		StepVerifier.create(get) //
+		get.as(StepVerifier::create) //
 				.expectNext("{\"_type\":\"example.springdata.redis.EmailAddress\",\"address\":\"homer@the-simpsons.com\"}") //
 				.verifyComplete();
 
-		StepVerifier.create(genericOperations.opsForValue().get("mail")) //
+		genericOperations.opsForValue().get("mail") //
+				.as(StepVerifier::create) //
 				.expectNext(new EmailAddress("homer@the-simpsons.com")) //
 				.verifyComplete();
 	}

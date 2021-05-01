@@ -45,22 +45,22 @@ class SimpleEntityTests {
 	void exerciseRepositoryForSimpleEntity() {
 
 		// create some categories
-		Category cars = new Category(null, "Cars", "Anything that has approximately 4 wheels", AgeGroup._3to8);
+		var cars = new Category(null, "Cars", "Anything that has approximately 4 wheels", AgeGroup._3to8);
 
-		Category buildings = new Category(null, "Buildings", null, AgeGroup._12andOlder);
+		var buildings = new Category(null, "Buildings", null, AgeGroup._12andOlder);
 
 		// save categories
-		Iterable<Category> saved = repository.saveAll(asList(cars, buildings));
+		var saved = repository.saveAll(asList(cars, buildings));
 		Output.list(repository.findAll(), "`Cars` and `Buildings` got saved");
 
-		assertThat(saved).extracting(c -> c.getId()).isNotNull();
+		assertThat(saved).extracting(Category::getId).isNotNull();
 
 		// update one
 		buildings.setDescription("Famous and impressive buildings incl. the 'bike shed'.");
 		repository.save(buildings);
 		Output.list(repository.findAll(), "`Buildings` has a description");
 
-		List<Category> categoryList = repository.getCategoriesWithAgeGroup(AgeGroup._3to8);
+		var categoryList = repository.getCategoriesWithAgeGroup(AgeGroup._3to8);
 
 		assertThat(categoryList) //
 				.extracting(Category::getName, Category::getDescription, Category::getAgeGroup) //

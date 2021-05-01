@@ -15,10 +15,6 @@
  */
 package example.springdata.mongodb.schema;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.lang.Nullable;
@@ -26,14 +22,7 @@ import org.springframework.lang.Nullable;
 /**
  * @author Christoph Strobl
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Document("star-wars")
-class Jedi {
+record Jedi(@Id String id, @Nullable String name, @Nullable String lastname, @Nullable Integer age) {
 
-	@Id String id;
-	@Nullable String name;
-	@Nullable String lastname;
-	@Nullable Integer age;
 }

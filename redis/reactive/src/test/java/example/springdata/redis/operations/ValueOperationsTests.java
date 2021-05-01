@@ -18,22 +18,19 @@ package example.springdata.redis.operations;
 import static org.assertj.core.api.Assertions.*;
 
 import example.springdata.redis.RedisTestConfiguration;
-import example.springdata.redis.test.util.RequiresRedisServer;
+import example.springdata.redis.test.condition.EnabledOnRedisAvailable;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
-import org.springframework.data.redis.core.ReactiveValueOperations;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * Show usage of reactive Template API on Redis strings using {@link ReactiveRedisOperations}.
@@ -41,17 +38,14 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author Mark Paluch
  */
 @Slf4j
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = RedisTestConfiguration.class)
-public class ValueOperationsTests {
-
-	// we only want to run this tests when redis is up an running
-	public static @ClassRule RequiresRedisServer requiresServer = RequiresRedisServer.onLocalhost();
+@EnabledOnRedisAvailable
+class ValueOperationsTests {
 
 	@Autowired ReactiveRedisOperations<String, String> operations;
 
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		StepVerifier.create(operations.execute(it -> it.serverCommands().flushDb())).expectNext("OK").verifyComplete();
 	}
 
@@ -59,13 +53,13 @@ public class ValueOperationsTests {
 	 * Implement a simple caching sequence using {@code GET} and {@code SETEX} commands.
 	 */
 	@Test
-	public void shouldCacheValue() {
+	void shouldCacheValue() {
 
-		String cacheKey = "foo";
+		var cacheKey = "foo";
 
-		ReactiveValueOperations<String, String> valueOperations = operations.opsForValue();
+		var valueOperations = operations.opsForValue();
 
-		Mono<String> cachedMono = valueOperations.get(cacheKey) //
+		var cachedMono = valueOperations.get(cacheKey) //
 				.switchIfEmpty(cacheValue().flatMap(it -> {
 
 					return valueOperations.set(cacheKey, it, Duration.ofSeconds(60)).then(Mono.just(it));
@@ -80,7 +74,7 @@ public class ValueOperationsTests {
 
 		log.info("Subsequent access (use cached value)");
 
-		Duration duration = StepVerifier.create(cachedMono) //
+		var duration = StepVerifier.create(cachedMono) //
 				.expectNext("Hello, World!") //
 				.verifyComplete();
 

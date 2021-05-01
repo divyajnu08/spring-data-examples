@@ -15,14 +15,15 @@
  */
 package example.springdata.jpa.querybyexample;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Example;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.assertj.core.api.Assertions.*;
 
 /**
  * Integration test showing the usage of JPA Query-by-Example support through Spring Data repositories and entities
@@ -33,6 +34,7 @@ import static org.assertj.core.api.Assertions.*;
  * @author Divya Srivastava
  * @author Jens Schauder
  */
+
 @Transactional
 @SpringBootTest
 public class UserRepositoryInheritanceIntegrationTests {

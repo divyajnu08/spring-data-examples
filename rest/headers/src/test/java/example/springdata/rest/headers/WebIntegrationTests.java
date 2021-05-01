@@ -21,13 +21,11 @@ import static org.springframework.restdocs.RestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.net.URI;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.restdocs.config.RestDocumentationConfigurer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -44,7 +42,7 @@ public class WebIntegrationTests {
 	@Autowired WebApplicationContext context;
 	@Autowired CustomerRepository customers;
 
-	MockMvc mvc;
+	private MockMvc mvc;
 
 	@BeforeEach
 	public void setUp() {
@@ -57,10 +55,10 @@ public class WebIntegrationTests {
 	@Test
 	public void executeConditionalGetRequests() throws Exception {
 
-		Customer customer = customers.findAll().iterator().next();
-		URI uri = new UriTemplate("/customers/{id}").expand(customer.getId());
+		var customer = customers.findAll().iterator().next();
+		var uri = new UriTemplate("/customers/{id}").expand(customer.getId());
 
-		MockHttpServletResponse response = mvc.perform(get(uri)).//
+		var response = mvc.perform(get(uri)).//
 				andExpect(header().string(ETAG, is(notNullValue()))).//
 				andExpect(header().string(LAST_MODIFIED, is(notNullValue()))).//
 				andReturn().getResponse();

@@ -173,7 +173,7 @@ public class EmbeddedMongo implements AfterAllCallback,BeforeAllCallback {
 
 			if (serverPorts.size() > 1 || StringUtils.hasText(replicaSetName)) {
 
-				String rsName = StringUtils.hasText(replicaSetName) ? replicaSetName : DEFAULT_REPLICA_SET_NAME;
+				var rsName = StringUtils.hasText(replicaSetName) ? replicaSetName : DEFAULT_REPLICA_SET_NAME;
 				return new EmbeddedMongo(
 						new ReplSet(version, rsName, silent, serverPorts.toArray(new Integer[serverPorts.size()])));
 			}
@@ -311,7 +311,7 @@ public class EmbeddedMongo implements AfterAllCallback,BeforeAllCallback {
 			replicaSets.put(replicaSetName, initReplicaSet());
 
 			// create mongos
-			MongosConfig mongosConfig = defaultMongosConfig(serverVersion, mongosPort, defaultCommandOptions(),
+			var mongosConfig = defaultMongosConfig(serverVersion, mongosPort, defaultCommandOptions(),
 					configServerReplicaSetName, configServerPorts[0]);
 
 			mongosTestFactory = new MongosSystemForTestFactory(mongosConfig, replicaSets, Collections.emptyList(),
@@ -346,7 +346,7 @@ public class EmbeddedMongo implements AfterAllCallback,BeforeAllCallback {
 
 			List<MongodConfig> configServers = new ArrayList<>(configServerPorts.length);
 
-			for (Integer port : configServerPorts) {
+			for (var port : configServerPorts) {
 				configServers.add(
 						defaultMongodConfig(serverVersion, port, defaultCommandOptions(), true, false, configServerReplicaSetName));
 			}
@@ -401,7 +401,7 @@ public class EmbeddedMongo implements AfterAllCallback,BeforeAllCallback {
 
 		try {
 
-			ImmutableMongodConfig.Builder builder = MongodConfig.builder() //
+			var builder = MongodConfig.builder() //
 					.version(version) //
 					.putArgs("--quiet", null) //
 					.net(new Net(LOCALHOST, port, Network.localhostIsIPv6())) //
@@ -440,7 +440,7 @@ public class EmbeddedMongo implements AfterAllCallback,BeforeAllCallback {
 
 		try {
 
-			ImmutableMongosConfig.Builder builder = MongosConfig.builder() //
+			var builder = MongosConfig.builder() //
 					.version(version) //
 					.putArgs("--quiet", null) //
 					.net(new Net(LOCALHOST, port, Network.localhostIsIPv6())) //

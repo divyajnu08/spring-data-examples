@@ -1,6 +1,6 @@
 # Spring Data Examples
 
-[![Build Status](https://travis-ci.org/spring-projects/spring-data-examples.svg?branch=issue%2F%2313)](https://travis-ci.org/spring-projects/spring-data-examples)
+[![Build Status](https://travis-ci.org/spring-projects/spring-data-examples.svg?branch=main)](https://travis-ci.org/spring-projects/spring-data-examples)
 
 This repository contains example projects for the different Spring Data modules to showcase the API and how to use the features provided by the modules.
 
@@ -9,7 +9,6 @@ We have separate folders for the samples of individual modules:
 ## Spring Data for Apache Cassandra
 
 * `example` - Shows core Spring Data support for Apache Cassandra.
-* `java8` - Java 8 specific functionality like the support for JSR-310 types in object mapping.
 * `kotlin` - Example for using Cassandra with Kotlin.
 * `reactive` - Example project to show reactive template and repository support.
 
@@ -38,7 +37,6 @@ We have separate folders for the samples of individual modules:
 * `eclipselink` - Sample project to show how to use Spring Data JPA with Spring Boot and [Eclipselink](https://www.eclipse.org/eclipselink/).
 * `example` - Probably the project you want to have a look at first. Contains a variety of sample packages, showcasing the different levels at which you can use Spring Data JPA. Have a look at the `simple` package for the most basic setup.
 * `interceptors` - Example of how to enrich the repositories with AOP.
-* `java8` - Example of how to use Spring Data JPA auditing with Java 8 date time types as well as the usage of `Optional` as return type for repository methods. Note, this project requires to be build with JDK 8.
 * `jpa21` - Shows support for JPA 2.1 specific features (stored procedures support).
 * `multiple-datasources` - Examples of how to use Spring Data JPA with multiple `DataSource`s.
 * `query-by-example` - Example project showing usage of Query by Example with Spring Data JPA.
@@ -57,7 +55,6 @@ We have separate folders for the samples of individual modules:
 * `fluent-api` - Example project to show the new fluent API (`MongoTemplate`-alternative) to interact with MongoDB.
 * `geo-json` - Example project showing usage of [GeoJSON](http://geojson.org) with MongoDB.
 * `gridfs` - Example project showing usage of gridFS with MongoDB.
-* `java8` - Example of how to use Spring Data MongoDB with Java 8 date time types as well as the usage of `Optional` as return type for repository methods. Note, this project requires to be build with JDK 8.
 * `jmolecules` - Example of Spring Data MongoDB working with a jMolecules based domain model.
 * `kotlin` - Example for using [Kotlin](https://kotlinlang.org/) with MongoDB.
 * `query-by-example` - Example project showing usage of Query by Example with MongoDB.
@@ -85,6 +82,8 @@ We have separate folders for the samples of individual modules:
 * `sentinel` - Example for Redis Sentinel support.
 * `streams` - Example for [Redis Streams](https://redis.io/topics/streams-intro) support.
 
+Local Redis instances must be running to run the tests.
+
 ## Spring Data REST
 
 * `headers` - A sample showing the population of HTTP headers and the usage of them to perform conditional `GET` requests.
@@ -107,11 +106,17 @@ We have separate folders for the samples of individual modules:
 
 ## Miscellaneous
 
-* `bom` - Example project how to use the Spring Data release train bom in non-Spring-Boot scenarios.
+* `bom` - Example project how to use the Spring Data release train bom in non-Spring-Boot
+  scenarios.
 * `map` - Example project to show how to use `Map`-backed repositories.
-* `multi-store` - Example project to use both Spring Data MongoDB and Spring Data JPA in one project.
+* `multi-store` - Example project to use both Spring Data MongoDB and Spring Data JPA in
+  one project.
 
 ## Note
 
-* The example projects make use of the [Lombok](https://projectlombok.org/) plugin. To get proper code navigation in your IDE, you must install it separately.
-Lombok is available in the IntelliJ plugins repository and as a [download](https://projectlombok.org/download) for Eclipse-based IDEs.
+* The example projects make use of the [Lombok](https://projectlombok.org/) plugin. To get
+  proper code navigation in your IDE, you must install it separately. Lombok is available
+  in the IntelliJ plugins repository and as
+  a [download](https://projectlombok.org/download) for Eclipse-based IDEs.
+
+You need Java 16 or newer and Docker to run and compile the examples. Most examples start their database via Testcontainers unless stated otherwise.

@@ -17,20 +17,18 @@ package example.springdata.mongodb.people
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import org.springframework.dao.EmptyResultDataAccessException
-import org.springframework.test.context.junit4.SpringRunner
 
 /**
  * Tests showing Kotlin usage of Spring Data Repositories.
  *
  * @author Mark Paluch
  */
-@SpringBootTest
+@DataMongoTest
 class RepositoryTests {
 
 	@Autowired

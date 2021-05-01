@@ -21,23 +21,22 @@ import static org.springframework.data.mongodb.core.query.Criteria.*;
 import static org.springframework.data.mongodb.core.query.Query.*;
 import static org.springframework.data.mongodb.core.query.Update.*;
 
-import com.mongodb.client.MongoClient;
 import example.springdata.mongodb.util.EmbeddedMongo;
-import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
 import org.bson.Document;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.core.ChangeStreamEvent;
 import org.springframework.data.mongodb.core.ChangeStreamOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
@@ -47,8 +46,9 @@ import org.springframework.data.mongodb.core.messaging.ChangeStreamRequest;
 import org.springframework.data.mongodb.core.messaging.DefaultMessageListenerContainer;
 import org.springframework.data.mongodb.core.messaging.Message;
 import org.springframework.data.mongodb.core.messaging.MessageListenerContainer;
-import org.springframework.data.mongodb.core.messaging.Subscription;
+import org.springframework.test.context.junit4.SpringRunner;
 
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.model.changestream.ChangeStreamDocument;
 import com.mongodb.reactivestreams.client.MongoClients;
 
@@ -147,14 +147,14 @@ public class ChangeStreamsTests {
 	@Test
 	public void imperativeChangeEvents() throws InterruptedException {
 
-		CollectingMessageListener<ChangeStreamDocument<Document>, Person> messageListener = new CollectingMessageListener<>();
+		var messageListener = new CollectingMessageListener<ChangeStreamDocument<Document>, Person>();
 
-		ChangeStreamRequest<Person> request = ChangeStreamRequest.builder(messageListener) //
+		var request = ChangeStreamRequest.builder(messageListener) //
 				.collection("person") //
 				.filter(newAggregation(match(where("operationType").is("insert")))) // we are only interested in inserts
 				.build();
 
-		Subscription subscription = container.register(request, Person.class);
+		var subscription = container.register(request, Person.class);
 		subscription.await(Duration.ofMillis(200)); // wait till the subscription becomes active
 
 		template.save(gabriel);
@@ -165,7 +165,7 @@ public class ChangeStreamsTests {
 		assertThat(messageListener.messageCount()).isEqualTo(2); // first two insert events, so far so good
 
 		template.update(Person.class) //
-				.matching(query(where("id").is(ash.getId()))) //
+				.matching(query(where("id").is(ash.id()))) //
 				.apply(update("age", 40)) //
 				.first();
 
@@ -186,7 +186,7 @@ public class ChangeStreamsTests {
 	@Test
 	public void reactiveChangeEvents() {
 
-		Flux<ChangeStreamEvent<Person>> changeStream = reactiveTemplate.changeStream("person",
+		var changeStream = reactiveTemplate.changeStream("person",
 				ChangeStreamOptions.builder().filter(newAggregation(match(where("operationType").is("insert")))).build(),
 				Person.class);
 
@@ -204,7 +204,7 @@ public class ChangeStreamsTests {
 				.then(() -> {
 
 					StepVerifier.create(reactiveTemplate.update(Person.class) //
-							.matching(query(where("id").is(ash.getId()))) //
+							.matching(query(where("id").is(ash.id()))) //
 							.apply(update("age", 40)) //
 							.first()).expectNextCount(1).verifyComplete();
 				}).expectNoEvent(Duration.ofMillis(200)) // updates are skipped

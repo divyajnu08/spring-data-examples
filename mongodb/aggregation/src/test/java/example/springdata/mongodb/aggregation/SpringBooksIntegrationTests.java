@@ -18,10 +18,6 @@ package example.springdata.mongodb.aggregation;
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
-import lombok.Getter;
-import lombok.Value;
-
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -29,20 +25,25 @@ import org.assertj.core.util.Files;
 import org.bson.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/main
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators;
 import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.data.mongodb.core.aggregation.BucketAutoOperation.Granularities;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/main
 
 /**
  * Examples for Spring Books using the MongoDB Aggregation Framework. Data originates from Google's Book search.
@@ -54,20 +55,24 @@ import org.springframework.data.mongodb.core.query.Query;
  * @see <a href="/books.json>books.json</a>
  */
 @SpringBootTest
-public class SpringBooksIntegrationTests {
+class SpringBooksIntegrationTests {
 
 	@Autowired MongoOperations operations;
 
 	@SuppressWarnings("unchecked")
 	@BeforeEach
+<<<<<<< HEAD
 	public void before() throws Exception {
+=======
+	void before() throws Exception {
+>>>>>>> upstream/main
 
 		if (operations.count(new Query(), "books") == 0) {
 
-			File file = new ClassPathResource("books.json").getFile();
-			String content = Files.contentOf(file, StandardCharsets.UTF_8);
-			Document wrapper = Document.parse("{wrapper: " + content + "}");
-			List<Object> books = wrapper.getList("wrapper", Object.class);
+			var file = new ClassPathResource("books.json").getFile();
+			var content = Files.contentOf(file, StandardCharsets.UTF_8);
+			var wrapper = Document.parse("{wrapper: " + content + "}");
+			var books = wrapper.getList("wrapper", Object.class);
 
 			operations.insert(books, "books");
 		}
@@ -77,13 +82,16 @@ public class SpringBooksIntegrationTests {
 	 * Project Book titles.
 	 */
 	@Test
-	public void shouldRetrieveOrderedBookTitles() {
+	void shouldRetrieveOrderedBookTitles() {
 
-		Aggregation aggregation = newAggregation( //
+		record BookTitle(String title) {
+		}
+
+		var aggregation = newAggregation( //
 				sort(Direction.ASC, "volumeInfo.title"), //
 				project().and("volumeInfo.title").as("title"));
 
-		AggregationResults<BookTitle> result = operations.aggregate(aggregation, "books", BookTitle.class);
+		var result = operations.aggregate(aggregation, "books", BookTitle.class);
 
 		assertThat(result.getMappedResults())//
 				.extracting("title")//
@@ -94,15 +102,15 @@ public class SpringBooksIntegrationTests {
 	 * Get number of books that were published by the particular publisher.
 	 */
 	@Test
-	public void shouldRetrieveBooksPerPublisher() {
+	void shouldRetrieveBooksPerPublisher() {
 
-		Aggregation aggregation = newAggregation( //
+		var aggregation = newAggregation( //
 				group("volumeInfo.publisher") //
 						.count().as("count"), //
 				sort(Direction.DESC, "count"), //
 				project("count").and("_id").as("publisher"));
 
-		AggregationResults<BooksPerPublisher> result = operations.aggregate(aggregation, "books", BooksPerPublisher.class);
+		var result = operations.aggregate(aggregation, "books", BooksPerPublisher.class);
 
 		assertThat(result).hasSize(27);
 		assertThat(result).extracting("publisher").containsSequence("Apress", "Packt Publishing Ltd");
@@ -113,42 +121,42 @@ public class SpringBooksIntegrationTests {
 	 * Get number of books that were published by the particular publisher with their titles.
 	 */
 	@Test
-	public void shouldRetrieveBooksPerPublisherWithTitles() {
+	void shouldRetrieveBooksPerPublisherWithTitles() {
 
-		Aggregation aggregation = newAggregation( //
+		var aggregation = newAggregation( //
 				group("volumeInfo.publisher") //
 						.count().as("count") //
 						.addToSet("volumeInfo.title").as("titles"), //
 				sort(Direction.DESC, "count"), //
 				project("count", "titles").and("_id").as("publisher"));
 
-		AggregationResults<BooksPerPublisher> result = operations.aggregate(aggregation, "books", BooksPerPublisher.class);
+		var result = operations.aggregate(aggregation, "books", BooksPerPublisher.class);
 
-		BooksPerPublisher booksPerPublisher = result.getMappedResults().get(0);
+		var booksPerPublisher = result.getMappedResults().get(0);
 
-		assertThat(booksPerPublisher.getPublisher()).isEqualTo("Apress");
-		assertThat(booksPerPublisher.getCount()).isEqualTo(26);
-		assertThat(booksPerPublisher.getTitles()).contains("Expert Spring MVC and Web Flow", "Pro Spring Boot");
+		assertThat(booksPerPublisher.publisher()).isEqualTo("Apress");
+		assertThat(booksPerPublisher.count()).isEqualTo(26);
+		assertThat(booksPerPublisher.titles()).contains("Expert Spring MVC and Web Flow", "Pro Spring Boot");
 	}
 
 	/**
 	 * Filter for Data-related books in their title and output the title and authors.
 	 */
 	@Test
-	public void shouldRetrieveDataRelatedBooks() {
+	void shouldRetrieveDataRelatedBooks() {
 
-		Aggregation aggregation = newAggregation( //
+		var aggregation = newAggregation( //
 				match(Criteria.where("volumeInfo.title").regex("data", "i")), //
 				replaceRoot("volumeInfo"), //
 				project("title", "authors"), //
 				sort(Direction.ASC, "title"));
 
-		AggregationResults<BookAndAuthors> result = operations.aggregate(aggregation, "books", BookAndAuthors.class);
+		var result = operations.aggregate(aggregation, "books", BookAndAuthors.class);
 
-		BookAndAuthors bookAndAuthors = result.getMappedResults().get(1);
+		var bookAndAuthors = result.getMappedResults().get(1);
 
-		assertThat(bookAndAuthors.getTitle()).isEqualTo("Spring Data");
-		assertThat(bookAndAuthors.getAuthors()).contains("Mark Pollack", "Oliver Gierke", "Thomas Risberg", "Jon Brisbin",
+		assertThat(bookAndAuthors.title()).isEqualTo("Spring Data");
+		assertThat(bookAndAuthors.authors()).contains("Mark Pollack", "Oliver Gierke", "Thomas Risberg", "Jon Brisbin",
 				"Michael Hunger");
 	}
 
@@ -156,9 +164,12 @@ public class SpringBooksIntegrationTests {
 	 * Retrieve the number of pages per author (and divide the number of pages by the number of authors).
 	 */
 	@Test
-	public void shouldRetrievePagesPerAuthor() {
+	void shouldRetrievePagesPerAuthor() {
 
-		Aggregation aggregation = newAggregation( //
+		record PagesPerAuthor(@Id String author, int totalPageCount, int approxWritten) {
+		}
+
+		var aggregation = newAggregation( //
 				match(Criteria.where("volumeInfo.authors").exists(true)), //
 				replaceRoot("volumeInfo"), //
 				project("authors", "pageCount") //
@@ -171,22 +182,22 @@ public class SpringBooksIntegrationTests {
 						.sum("pagesPerAuthor").as("approxWritten"), //
 				sort(Direction.DESC, "totalPageCount"));
 
-		AggregationResults<PagesPerAuthor> result = operations.aggregate(aggregation, "books", PagesPerAuthor.class);
+		var result = operations.aggregate(aggregation, "books", PagesPerAuthor.class);
 
-		PagesPerAuthor pagesPerAuthor = result.getMappedResults().get(0);
+		var pagesPerAuthor = result.getMappedResults().get(0);
 
-		assertThat(pagesPerAuthor.getAuthor()).isEqualTo("Josh Long");
-		assertThat(pagesPerAuthor.getTotalPageCount()).isEqualTo(1892);
-		assertThat(pagesPerAuthor.getApproxWritten()).isEqualTo(573);
+		assertThat(pagesPerAuthor.author()).isEqualTo("Josh Long");
+		assertThat(pagesPerAuthor.totalPageCount()).isEqualTo(1892);
+		assertThat(pagesPerAuthor.approxWritten()).isEqualTo(573);
 	}
 
 	/**
 	 * Categorize books by their page count into buckets.
 	 */
 	@Test
-	public void shouldCategorizeBooksInBuckets() {
+	void shouldCategorizeBooksInBuckets() {
 
-		Aggregation aggregation = newAggregation( //
+		var aggregation = newAggregation( //
 				replaceRoot("volumeInfo"), //
 				match(Criteria.where("pageCount").exists(true)),
 				bucketAuto("pageCount", 10) //
@@ -194,20 +205,20 @@ public class SpringBooksIntegrationTests {
 						.andOutput("title").push().as("titles") //
 						.andOutput("titles").count().as("count"));
 
-		AggregationResults<BookFacetPerPage> result = operations.aggregate(aggregation, "books", BookFacetPerPage.class);
+		var result = operations.aggregate(aggregation, "books", BookFacetPerPage.class);
 
-		List<BookFacetPerPage> mappedResults = result.getMappedResults();
+		var mappedResults = result.getMappedResults();
 
-		BookFacetPerPage facet_20_to_100_pages = mappedResults.get(0);
-		assertThat(facet_20_to_100_pages.getId().getMin()).isEqualTo(20);
-		assertThat(facet_20_to_100_pages.getId().getMax()).isEqualTo(100);
-		assertThat(facet_20_to_100_pages.getCount()).isEqualTo(12);
+		var facet_20_to_100_pages = mappedResults.get(0);
+		assertThat(facet_20_to_100_pages.id().min()).isEqualTo(20);
+		assertThat(facet_20_to_100_pages.id().max()).isEqualTo(100);
+		assertThat(facet_20_to_100_pages.count()).isEqualTo(12);
 
-		BookFacetPerPage facet_100_to_500_pages = mappedResults.get(1);
-		assertThat(facet_100_to_500_pages.getId().getMin()).isEqualTo(100);
-		assertThat(facet_100_to_500_pages.getId().getMax()).isEqualTo(500);
-		assertThat(facet_100_to_500_pages.getCount()).isEqualTo(63);
-		assertThat(facet_100_to_500_pages.getTitles()).contains("Spring Data");
+		var facet_100_to_500_pages = mappedResults.get(1);
+		assertThat(facet_100_to_500_pages.id().min()).isEqualTo(100);
+		assertThat(facet_100_to_500_pages.id().max()).isEqualTo(500);
+		assertThat(facet_100_to_500_pages.count()).isEqualTo(63);
+		assertThat(facet_100_to_500_pages.titles()).contains("Spring Data");
 	}
 
 	/**
@@ -216,9 +227,9 @@ public class SpringBooksIntegrationTests {
 	 */
 	@Test
 	@SuppressWarnings("unchecked")
-	public void shouldCategorizeInMultipleFacetsByPriceAndAuthor() {
+	void shouldCategorizeInMultipleFacetsByPriceAndAuthor() {
 
-		Aggregation aggregation = newAggregation( //
+		var aggregation = newAggregation( //
 				match(Criteria.where("volumeInfo.authors").exists(true).and("volumeInfo.publisher").exists(true)),
 				facet() //
 						.and(match(Criteria.where("saleInfo.listPrice").exists(true)), //
@@ -237,55 +248,23 @@ public class SpringBooksIntegrationTests {
 										.andOutput("author").push().as("authors") //
 						).as("authors"));
 
-		AggregationResults<Document> result = operations.aggregate(aggregation, "books", Document.class);
+		var result = operations.aggregate(aggregation, "books", Document.class);
 
-		Document uniqueMappedResult = result.getUniqueMappedResult();
+		var uniqueMappedResult = result.getUniqueMappedResult();
 
 		assertThat((List<Object>) uniqueMappedResult.get("prices")).hasSize(3);
 		assertThat((List<Object>) uniqueMappedResult.get("authors")).hasSize(8);
 	}
 
-	@Value
-	@Getter
-	static class BookTitle {
-		String title;
+	private record BooksPerPublisher(String publisher, int count, List<String> titles) {
 	}
 
-	@Value
-	@Getter
-	static class BooksPerPublisher {
-		String publisher;
-		int count;
-		List<String> titles;
+	private record BookAndAuthors(String title, List<String> authors) {
 	}
 
-	@Value
-	@Getter
-	static class BookAndAuthors {
-		String title;
-		List<String> authors;
+	private record BookFacetPerPage(BookFacetPerPageId id, int count, List<String> titles) {
 	}
 
-	@Value
-	@Getter
-	static class PagesPerAuthor {
-		@Id String author;
-		int totalPageCount;
-		int approxWritten;
-	}
-
-	@Value
-	@Getter
-	static class BookFacetPerPage {
-		BookFacetPerPageId id;
-		int count;
-		List<String> titles;
-	}
-
-	@Value
-	@Getter
-	static class BookFacetPerPageId {
-		int min;
-		int max;
+	private record BookFacetPerPageId(int min, int max) {
 	}
 }

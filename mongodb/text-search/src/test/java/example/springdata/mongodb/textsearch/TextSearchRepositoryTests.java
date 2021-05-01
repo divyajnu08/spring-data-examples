@@ -17,14 +17,12 @@ package example.springdata.mongodb.textsearch;
 
 import static example.springdata.mongodb.util.ConsoleResultPrinter.*;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.mongodb.core.mapping.TextScore;
 import org.springframework.data.mongodb.core.query.TextCriteria;
-
 
 /**
  * Integration tests showing the text search functionality using repositories.
@@ -33,9 +31,8 @@ import org.springframework.data.mongodb.core.query.TextCriteria;
  * @author Oliver Gierke
  * @author Thomas Darimont
  */
-
-@SpringBootTest
-public class TextSearchRepositoryTests {
+@DataMongoTest
+class TextSearchRepositoryTests {
 
 	@Autowired BlogPostRepository repo;
 
@@ -44,10 +41,10 @@ public class TextSearchRepositoryTests {
 	 * Note that text search is case insensitive and will also find entries like {@literal releases}.
 	 */
 	@Test
-	public void findAllBlogPostsWithRelease() {
+	void findAllBlogPostsWithRelease() {
 
-		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingAny("release");
-		List<BlogPost> blogPosts = repo.findAllBy(criteria);
+		var criteria = TextCriteria.forDefaultLanguage().matchingAny("release");
+		var blogPosts = repo.findAllBy(criteria);
 
 		printResult(blogPosts, criteria);
 	}
@@ -56,10 +53,10 @@ public class TextSearchRepositoryTests {
 	 * Simple matching using negation.
 	 */
 	@Test
-	public void findAllBlogPostsWithReleaseButHeyIDoWantTheEngineeringStuff() {
+	void findAllBlogPostsWithReleaseButHeyIDoWantTheEngineeringStuff() {
 
-		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingAny("release").notMatching("engineering");
-		List<BlogPost> blogPosts = repo.findAllBy(criteria);
+		var criteria = TextCriteria.forDefaultLanguage().matchingAny("release").notMatching("engineering");
+		var blogPosts = repo.findAllBy(criteria);
 
 		printResult(blogPosts, criteria);
 	}
@@ -68,10 +65,10 @@ public class TextSearchRepositoryTests {
 	 * Phrase matching looks for the whole phrase as one.
 	 */
 	@Test
-	public void findAllBlogPostsByPhrase() {
+	void findAllBlogPostsByPhrase() {
 
-		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingPhrase("release candidate");
-		List<BlogPost> blogPosts = repo.findAllBy(criteria);
+		var criteria = TextCriteria.forDefaultLanguage().matchingPhrase("release candidate");
+		var blogPosts = repo.findAllBy(criteria);
 
 		printResult(blogPosts, criteria);
 	}
@@ -80,10 +77,10 @@ public class TextSearchRepositoryTests {
 	 * Sort by relevance relying on the value marked with {@link TextScore}.
 	 */
 	@Test
-	public void findAllBlogPostsByPhraseSortByScore() {
+	void findAllBlogPostsByPhraseSortByScore() {
 
-		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingPhrase("release candidate");
-		List<BlogPost> blogPosts = repo.findAllByOrderByScoreDesc(criteria);
+		var criteria = TextCriteria.forDefaultLanguage().matchingPhrase("release candidate");
+		var blogPosts = repo.findAllByOrderByScoreDesc(criteria);
 
 		printResult(blogPosts, criteria);
 	}

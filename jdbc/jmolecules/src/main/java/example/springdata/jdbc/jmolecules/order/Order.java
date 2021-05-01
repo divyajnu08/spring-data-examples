@@ -20,7 +20,6 @@ import example.springdata.jdbc.jmolecules.customer.Customer.CustomerId;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import lombok.Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,27 +46,19 @@ public class Order implements AggregateRoot<Order, Order.OrderId> {
 
 	public Order(Customer customer) {
 
-		this.id = OrderId.of(UUID.randomUUID());
+		this.id = new OrderId(UUID.randomUUID());
 		this.customer = Association.forAggregate(customer);
 		this.lineItems = new ArrayList<>();
 	}
 
 	public Order addLineItem(String description) {
 
-		LineItem item = new LineItem(description);
+		var item = new LineItem(description);
 
 		this.lineItems.add(item);
 
 		return this;
 	}
 
-	@Value(staticConstructor = "of")
-	public static class OrderId implements Identifier {
-
-		private final UUID orderId;
-
-		public static OrderId create() {
-			return OrderId.of(UUID.randomUUID());
-		}
-	}
+	public record OrderId(UUID id) implements Identifier {}
 }

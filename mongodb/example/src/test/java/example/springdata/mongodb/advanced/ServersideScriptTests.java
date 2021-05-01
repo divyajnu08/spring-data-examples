@@ -25,25 +25,42 @@ import org.bson.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/main
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.script.ExecutableMongoScript;
 import org.springframework.data.mongodb.core.script.NamedMongoScript;
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/main
 
 /**
  * @author Christoph Strobl
  * @author Oliver Gierke
  */
+<<<<<<< HEAD
 @SpringBootTest
 public class ServersideScriptTests {
+=======
+@DataMongoTest
+class ServersideScriptTests {
+>>>>>>> upstream/main
 
 	@Autowired AdvancedRepository repository;
 	@Autowired MongoOperations operations;
 
 	@BeforeEach
+<<<<<<< HEAD
 	public void setUp() {
+=======
+	void setUp() {
+>>>>>>> upstream/main
 
 		if (!operations.collectionExists(Customer.class)) {
 			operations.createCollection(Customer.class);
@@ -58,7 +75,7 @@ public class ServersideScriptTests {
 	 * Store and call an arbitrary JavaScript function (in this case a simple echo script) via its name.
 	 */
 	@Test
-	public void saveAndCallScriptViaName() {
+	void saveAndCallScriptViaName() {
 
 		operations.scriptOps()
 				.register(new NamedMongoScript("echoScript", new ExecutableMongoScript("function(x) { return x; }")));
@@ -72,9 +89,13 @@ public class ServersideScriptTests {
 	 */
 	@Test
 	@Disabled
+<<<<<<< HEAD
 	public void complexScriptExecutionSimulatingPutIfAbsent() {
+=======
+	void complexScriptExecutionSimulatingPutIfAbsent() {
+>>>>>>> upstream/main
 
-		Customer ned = new Customer("Ned", "Stark");
+		var ned = new Customer("Ned", "Stark");
 		ned.setId("ned-stark");
 
 		// #1: on first insert null has to be returned
@@ -92,14 +113,14 @@ public class ServersideScriptTests {
 
 	private ExecutableMongoScript createExecutablePutIfAbsentScript(Customer customer) {
 
-		String collectionName = operations.getCollectionName(Customer.class);
-		Object id = operations.getConverter().getMappingContext().getRequiredPersistentEntity(Customer.class)
+		var collectionName = operations.getCollectionName(Customer.class);
+		var id = operations.getConverter().getMappingContext().getRequiredPersistentEntity(Customer.class)
 				.getIdentifierAccessor(customer).getIdentifier();
 
-		Document document = new Document();
+		var document = new Document();
 		operations.getConverter().write(customer, document);
 
-		String scriptString = String.format(
+		var scriptString = String.format(
 				"object  =  db.%1$s.findOne({\"_id\": \"%2$s\"}); if (object == null) { db.%1s.insert(%3$s); return null; } else { return object; }",
 				collectionName, id, document);
 

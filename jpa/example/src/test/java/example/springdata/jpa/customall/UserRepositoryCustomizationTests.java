@@ -15,9 +15,10 @@
  */
 package example.springdata.jpa.customall;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,14 +30,15 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Divya Srivastava
  * @soundtrack Elen - It's you (Elen)
  */
+
 @Transactional
 @SpringBootTest
-public class UserRepositoryCustomizationTests {
+class UserRepositoryCustomizationTests {
 
 	@Autowired UserRepository repository;
 
 	@Test
-	public void invokesCustomMethod() {
+	void invokesCustomMethod() {
 		assertThat(repository.customMethod()).isEqualTo(0L);
 	}
 }

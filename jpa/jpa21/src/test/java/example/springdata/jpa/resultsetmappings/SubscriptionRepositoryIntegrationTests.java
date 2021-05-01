@@ -15,11 +15,12 @@
  */
 package example.springdata.jpa.resultsetmappings;
 
-import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.assertThat;
+import static java.util.Arrays.*;
+import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @DataJpaTest
 @Transactional
-public class SubscriptionRepositoryIntegrationTests {
+class SubscriptionRepositoryIntegrationTests {
 
 	private static final String SERVICE_1 = "Service 1";
 	private static final String SERVICE_2 = "Service 2";
@@ -38,7 +39,7 @@ public class SubscriptionRepositoryIntegrationTests {
 	@Autowired SubscriptionRepository repository;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 
 		repository.save(new Subscription(SERVICE_1, 1));
 		repository.save(new Subscription(SERVICE_1, 2));
@@ -48,17 +49,15 @@ public class SubscriptionRepositoryIntegrationTests {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
-	public void shouldReturnCorrectSubscriptionSummary() {
+	void shouldReturnCorrectSubscriptionSummary() {
 
 		assertThat(repository.findAllSubscriptionSummaries()) //
-				.flatExtracting(s -> asList(s.getProduct(), s.getUsageCount())) //
+				.flatExtracting(s -> asList(s.product(), s.usageCount())) //
 				.contains(SERVICE_1, 3L, SERVICE_2, 2L);
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
-	public void shouldReturnCorrectSubscriptionProjection() {
+	void shouldReturnCorrectSubscriptionProjection() {
 
 		assertThat(repository.findAllSubscriptionProjections()) //
 				.flatExtracting(s -> asList(s.getProduct(), s.getUsageCount())) //

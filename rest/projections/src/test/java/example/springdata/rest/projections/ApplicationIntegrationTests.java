@@ -15,10 +15,10 @@
  */
 package example.springdata.rest.projections;
 
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -35,8 +35,8 @@ public class ApplicationIntegrationTests {
 	@Test
 	public void initializesRepositoryWithSampleData() {
 
-		Iterable<Order> result = repository.findAll();
+		var result = repository.findAll();
 
-		assertThat(result, is(iterableWithSize(1)));
+		assertThat(result).hasSize(1);
 	}
 }

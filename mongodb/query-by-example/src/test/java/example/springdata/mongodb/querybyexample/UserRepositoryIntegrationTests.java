@@ -23,11 +23,11 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.data.domain.ExampleMatcher.*;
 
 /**
  * Integration test showing the usage of MongoDB Query-by-Example support through Spring Data repositories.
@@ -37,15 +37,15 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author Jens Schauder
  */
 @SuppressWarnings("unused")
-@SpringBootTest
-public class UserRepositoryIntegrationTests {
+@DataMongoTest
+class UserRepositoryIntegrationTests {
 
 	@Autowired UserRepository repository;
 
-	Person skyler, walter, flynn, marie, hank;
+	private Person skyler, walter, flynn, marie, hank;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 
 		repository.deleteAll();
 
@@ -60,9 +60,9 @@ public class UserRepositoryIntegrationTests {
 	 * @see #153
 	 */
 	@Test
-	public void countBySimpleExample() {
+	void countBySimpleExample() {
 
-		Example<Person> example = Example.of(new Person(null, "White", null));
+		var example = Example.of(new Person(null, "White", null));
 
 		assertThat(repository.count(example)).isEqualTo(3L);
 	}
@@ -71,9 +71,9 @@ public class UserRepositoryIntegrationTests {
 	 * @see #153
 	 */
 	@Test
-	public void ignorePropertiesAndMatchByAge() {
+	void ignorePropertiesAndMatchByAge() {
 
-		Example<Person> example = Example.of(flynn, matching(). //
+		var example = Example.of(flynn, matching(). //
 				withIgnorePaths("firstname", "lastname"));
 
 		assertThat(repository.findOne(example)).contains(flynn);
@@ -83,9 +83,9 @@ public class UserRepositoryIntegrationTests {
 	 * @see #153
 	 */
 	@Test
-	public void substringMatching() {
+	void substringMatching() {
 
-		Example<Person> example = Example.of(new Person("er", null, null), matching(). //
+		var example = Example.of(new Person("er", null, null), matching(). //
 				withStringMatcher(StringMatcher.ENDING));
 
 		assertThat(repository.findAll(example)).containsExactlyInAnyOrder(skyler, walter);
@@ -95,10 +95,10 @@ public class UserRepositoryIntegrationTests {
 	 * @see #153
 	 */
 	@Test
-	public void regexMatching() {
+	void regexMatching() {
 
-		Example<Person> example = Example.of(new Person("(Skyl|Walt)er", null, null), matching(). //
-				withMatcher("firstname", matcher -> matcher.regex()));
+		var example = Example.of(new Person("(Skyl|Walt)er", null, null), matching(). //
+				withMatcher("firstname", GenericPropertyMatcher::regex));
 
 		assertThat(repository.findAll(example)).contains(skyler, walter);
 	}
@@ -107,9 +107,9 @@ public class UserRepositoryIntegrationTests {
 	 * @see #153
 	 */
 	@Test
-	public void matchStartingStringsIgnoreCase() {
+	void matchStartingStringsIgnoreCase() {
 
-		Example<Person> example = Example.of(new Person("Walter", "WHITE", null), matching(). //
+		var example = Example.of(new Person("Walter", "WHITE", null), matching(). //
 				withIgnorePaths("age"). //
 				withMatcher("firstname", startsWith()). //
 				withMatcher("lastname", ignoreCase()));
@@ -121,12 +121,12 @@ public class UserRepositoryIntegrationTests {
 	 * @see #153
 	 */
 	@Test
-	public void configuringMatchersUsingLambdas() {
+	void configuringMatchersUsingLambdas() {
 
-		Example<Person> example = Example.of(new Person("Walter", "WHITE", null), matching(). //
+		var example = Example.of(new Person("Walter", "WHITE", null), matching(). //
 				withIgnorePaths("age"). //
-				withMatcher("firstname", matcher -> matcher.startsWith()). //
-				withMatcher("lastname", matcher -> matcher.ignoreCase()));
+				withMatcher("firstname", GenericPropertyMatcher::startsWith). //
+				withMatcher("lastname", GenericPropertyMatcher::ignoreCase));
 
 		assertThat(repository.findAll(example)).containsExactlyInAnyOrder(flynn, walter);
 	}
@@ -135,10 +135,10 @@ public class UserRepositoryIntegrationTests {
 	 * @see #153
 	 */
 	@Test
-	public void valueTransformer() {
+	void valueTransformer() {
 
-		Example<Person> example = Example.of(new Person(null, "White", 99), matching(). //
-				withMatcher("age", matcher -> matcher.transform(value -> Optional.of(Integer.valueOf(50)))));
+		var example = Example.of(new Person(null, "White", 99), matching(). //
+				withMatcher("age", matcher -> matcher.transform(value -> Optional.of(50))));
 
 		assertThat(repository.findAll(example)).containsExactlyInAnyOrder(walter);
 	}

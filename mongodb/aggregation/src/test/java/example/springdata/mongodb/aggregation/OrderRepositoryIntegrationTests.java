@@ -22,6 +22,7 @@ import java.util.Date;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort;
@@ -35,7 +36,7 @@ import org.springframework.data.domain.Sort;
  * @author Divya Srivastava
  */
 @SpringBootTest
-public class OrderRepositoryIntegrationTests {
+class OrderRepositoryIntegrationTests {
 
 	@Autowired OrderRepository repository;
 
@@ -44,44 +45,44 @@ public class OrderRepositoryIntegrationTests {
 	private final static LineItem product3 = new LineItem("p3", 5.33);
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		repository.deleteAll();
 	}
 
 	@Test
-	public void createsInvoiceViaProgrammaticAggregation() {
+	void createsInvoiceViaProgrammaticAggregation() {
 
-		Order order = new Order("c42", new Date()).//
+		var order = new Order("c42", new Date()).//
 				addItem(product1).addItem(product2).addItem(product3);
 		order = repository.save(order);
 
-		Invoice invoice = repository.getInvoiceFor(order);
+		var invoice = repository.getInvoiceFor(order);
 
 		assertThat(invoice).isNotNull();
-		assertThat(invoice.getOrderId()).isEqualTo(order.getId());
-		assertThat(invoice.getNetAmount()).isCloseTo(8.3D, offset(0.00001));
-		assertThat(invoice.getTaxAmount()).isCloseTo(1.577D, offset(0.00001));
-		assertThat(invoice.getTotalAmount()).isCloseTo(9.877, offset(0.00001));
+		assertThat(invoice.orderId()).isEqualTo(order.getId());
+		assertThat(invoice.netAmount()).isCloseTo(8.3D, offset(0.00001));
+		assertThat(invoice.taxAmount()).isCloseTo(1.577D, offset(0.00001));
+		assertThat(invoice.totalAmount()).isCloseTo(9.877, offset(0.00001));
 	}
 
 	@Test
-	public void createsInvoiceViaDeclarativeAggregation() {
+	void createsInvoiceViaDeclarativeAggregation() {
 
-		Order order = new Order("c42", new Date()).//
+		var order = new Order("c42", new Date()).//
 				addItem(product1).addItem(product2).addItem(product3);
 		order = repository.save(order);
 
-		Invoice invoice = repository.aggregateInvoiceForOrder(order.getId());
+		var invoice = repository.aggregateInvoiceForOrder(order.getId());
 
 		assertThat(invoice).isNotNull();
-		assertThat(invoice.getOrderId()).isEqualTo(order.getId());
-		assertThat(invoice.getNetAmount()).isCloseTo(8.3D, offset(0.00001));
-		assertThat(invoice.getTaxAmount()).isCloseTo(1.577D, offset(0.00001));
-		assertThat(invoice.getTotalAmount()).isCloseTo(9.877, offset(0.00001));
+		assertThat(invoice.orderId()).isEqualTo(order.getId());
+		assertThat(invoice.netAmount()).isCloseTo(8.3D, offset(0.00001));
+		assertThat(invoice.taxAmount()).isCloseTo(1.577D, offset(0.00001));
+		assertThat(invoice.totalAmount()).isCloseTo(9.877, offset(0.00001));
 	}
 
 	@Test
-	public void declarativeAggregationWithSort() {
+	void declarativeAggregationWithSort() {
 
 		repository.save(new Order("c42", new Date()).addItem(product1));
 		repository.save(new Order("c42", new Date()).addItem(product2));
@@ -97,7 +98,7 @@ public class OrderRepositoryIntegrationTests {
 	}
 
 	@Test
-	public void multiStageDeclarativeAggregation() {
+	void multiStageDeclarativeAggregation() {
 
 		repository.save(new Order("c42", new Date()).addItem(product1));
 		repository.save(new Order("c42", new Date()).addItem(product2));

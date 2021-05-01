@@ -17,6 +17,7 @@ package example.users;
 
 
 import org.junit.jupiter.api.Test;
+
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
@@ -24,8 +25,8 @@ import org.springframework.boot.test.context.SpringBootTest;
  * @author Divya Srivastava
  */
 @SpringBootTest
-public class ApplicationTests {
+class ApplicationTests {
 
 	@Test
-	public void contextBootstraps() {}
+	void contextBootstraps() {}
 }

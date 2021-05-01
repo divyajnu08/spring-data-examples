@@ -15,7 +15,7 @@
  */
 package example.springdata.rest.security;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -96,7 +96,7 @@ class MethodLevelSecurityTests {
 
 		itemRepository.findAll();
 
-		Item item = itemRepository.save(new Item("MacBook Pro"));
+		var item = itemRepository.save(new Item("MacBook Pro"));
 
 		itemRepository.deleteById(item.getId());
 	}

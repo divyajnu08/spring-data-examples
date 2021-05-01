@@ -20,9 +20,10 @@ import static org.assertj.core.api.Assertions.*;
 import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.Test;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
 
 /**
  * Integration test for {@link CustomerRepository}.
@@ -30,6 +31,8 @@ import org.springframework.boot.test.context.SpringBootTest;
  * @author Oliver Gierke
  * @author Divya Srivastava
  */
+
+
 @SpringBootTest
 @Transactional
 public class CustomerRepositoryIntegrationTests {

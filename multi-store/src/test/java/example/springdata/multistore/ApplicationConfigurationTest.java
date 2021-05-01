@@ -15,11 +15,6 @@
  */
 package example.springdata.multistore;
 
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import org.junit.jupiter.api.Test;
-
 import example.springdata.multistore.customer.Customer;
 import example.springdata.multistore.shop.Order;
 
@@ -29,6 +24,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.repository.support.Repositories;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration test to check repository interfaces are assigned to the correct store modules.
@@ -43,9 +40,9 @@ public class ApplicationConfigurationTest {
 	@Test
 	public void repositoriesAreAssignedToAppropriateStores() {
 
-		Repositories repositories = new Repositories(context);
+		var repositories = new Repositories(context);
 
-		assertThat(repositories.getEntityInformationFor(Customer.class), is(instanceOf(JpaEntityInformation.class)));
-		assertThat(repositories.getEntityInformationFor(Order.class), is(instanceOf(MongoEntityInformation.class)));
+		assertThat(repositories.getEntityInformationFor(Customer.class)).isInstanceOf(JpaEntityInformation.class);
+		assertThat(repositories.getEntityInformationFor(Order.class)).isInstanceOf(MongoEntityInformation.class);
 	}
 }

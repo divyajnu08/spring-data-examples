@@ -21,7 +21,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,13 +41,13 @@ public class Customer implements AggregateRoot<Customer, CustomerId> {
 
 	private final CustomerId id;
 	private @Setter String firstname, lastname;
-	private List<Address> addresses;
+	private final List<Address> addresses;
 
 	public Customer(String firstname, String lastname, Address address) {
 
 		Assert.notNull(address, "Address must not be null!");
 
-		this.id = CustomerId.of(UUID.randomUUID().toString());
+		this.id = new CustomerId(UUID.randomUUID());
 
 		this.firstname = firstname;
 		this.lastname = lastname;
@@ -57,8 +56,5 @@ public class Customer implements AggregateRoot<Customer, CustomerId> {
 		this.addresses.add(address);
 	}
 
-	@Value(staticConstructor = "of")
-	public static class CustomerId implements Identifier {
-		private final String id;
-	}
+	public record CustomerId(UUID id) implements Identifier {}
 }

@@ -15,8 +15,7 @@
  */
 package example.springdata.rest.stores;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.*;
 
 import example.springdata.rest.stores.Store.Address;
 
@@ -25,9 +24,9 @@ import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
@@ -53,15 +52,15 @@ public class StoreRepositoryIntegrationTests {
 	@Test
 	public void findsStoresByLocation() {
 
-		Point location = new Point(-73.995146, 40.740337);
-		Store store = new Store(UUID.randomUUID(), "Foo", new Address("street", "city", "zip", location));
+		var location = new Point(-73.995146, 40.740337);
+		var store = new Store(UUID.randomUUID(), "Foo", new Address("street", "city", "zip", location));
 
 		store = repository.save(store);
 
-		Page<Store> stores = repository.findByAddressLocationNear(location, new Distance(1.0, Metrics.KILOMETERS),
+		var stores = repository.findByAddressLocationNear(location, new Distance(1.0, Metrics.KILOMETERS),
 				PageRequest.of(0, 10));
 
-		assertThat(stores.getContent(), hasSize(1));
-		assertThat(stores.getContent(), hasItem(store));
+		assertThat(stores.getContent()).hasSize(1);
+		assertThat(stores.getContent()).contains(store);
 	}
 }

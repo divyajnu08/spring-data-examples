@@ -19,29 +19,30 @@ import static org.assertj.core.api.Assertions.*;
 
 import example.springdata.mongodb.Customer;
 import example.springdata.mongodb.QCustomer;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.mongodb.core.MongoOperations;
 
 /**
  * @author Christoph Strobl
  */
-@SpringBootTest
-public class ReactiveCustomerRepositoryTests {
+@DataMongoTest
+class ReactiveCustomerRepositoryTests {
 
 	@Autowired ReactiveCustomerQuerydslRepository repository;
 	@Autowired MongoOperations operations;
 
-	Customer dave, oliver, carter;
+	private Customer dave, oliver, carter;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 
 		repository.deleteAll().as(StepVerifier::create).verifyComplete();
 
@@ -53,7 +54,7 @@ public class ReactiveCustomerRepositoryTests {
 	}
 
 	@Test
-	public void findAllByPredicate() {
+	void findAllByPredicate() {
 
 		repository.findAll(QCustomer.customer.lastname.eq("Matthews")) //
 				.collectList() //
